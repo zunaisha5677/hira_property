@@ -7,7 +7,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     $email = $_POST['email'];
     $phone = $_POST['phone'];
     $role = $_POST['role'];
-    $password = md5($_POST['password']);
+    $password_raw = $_POST['password'];
+
+    if (!preg_match('/[A-Z]/', $password_raw) || 
+        !preg_match('/[a-z]/', $password_raw) || 
+        !preg_match('/[0-9]/', $password_raw) || 
+        strlen($password_raw) < 8) {
+        echo "<script>alert('Password weak hai! Kam se kam 8 characters, ek bara letter aur ek number shamil karein.'); window.history.back();</script>";
+        exit();
+    }
+
+    $password = md5($password_raw);
 
     $query = "INSERT INTO users 
               (first_name, last_name, email, phone, role, password) 
@@ -46,14 +56,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             border: 1px solid #ddd;
             width: 400px;
         }
-        h2{
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .row{
-            display: flex;
-            gap: 10px;
-        }
+        h2{ text-align: center; margin-bottom: 20px; }
+        .row{ display: flex; gap: 10px; }
         input, select{
             width: 100%;
             padding: 10px;
@@ -73,12 +77,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             font-size: 16px;
             margin-top: 10px;
         }
-        p{
-            text-align: center;
-            margin-top: 15px;
+        button:disabled{
+            background: #ccc;
+            cursor: not-allowed;
         }
-        a{
-            color: #E8622A;
+        p{ text-align: center; margin-top: 15px; }
+        a{ color: #E8622A; }
+        .password-wrapper{ position: relative; }
+        .password-wrapper input{ padding-right: 40px; }
+        .eye-icon{
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            user-select: none;
         }
     </style>
 </head>
@@ -102,13 +116,62 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <option value="manager">Property Manager</option>
                 <option value="admin">Admin</option>
             </select>
-            <input type="password" name="password" 
-                   placeholder="Create a strong password" required>
-            <button type="submit">Register</button>
+
+            <div class="password-wrapper">
+                <input type="password" id="password" name="password" 
+                       placeholder="Create a strong password" 
+                       required onkeyup="checkPasswordStrength();">
+                <span class="eye-icon" 
+                      onclick="togglePassword('password')">
+                    👁️
+                </span>
+            </div>
+
+            <span id="password-err" 
+                  style="color:red; font-size:13px; display:block; 
+                         margin-top:2px; margin-bottom:8px; 
+                         font-weight:bold;">
+            </span>
+
+            <button type="submit" id="register-btn">Register</button>
         </form>
         <p>Already have account? 
            <a href="login.php">Log In</a>
         </p>
     </div>
+
+    <script>
+    function togglePassword(id){
+        var input = document.getElementById(id);
+        if(input.type === 'password'){
+            input.type = 'text';
+        } else {
+            input.type = 'password';
+        }
+    }
+
+    function checkPasswordStrength(){
+        var password = document.getElementById('password').value;
+        var errorSpan = document.getElementById('password-err');
+        var submitBtn = document.getElementById('register-btn');
+        var strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+        if(password.length === 0){
+            errorSpan.innerHTML = "";
+            submitBtn.disabled = false;
+            return;
+        }
+
+        if(!strongRegex.test(password)){
+            errorSpan.style.color = "red";
+            errorSpan.innerHTML = "❌ Password must be at least 8 characters, include 1 uppercase, 1 lowercase, and 1 number.";
+            submitBtn.disabled = true;
+        } else {
+            errorSpan.style.color = "green";
+            errorSpan.innerHTML = "✅ Strong Password!";
+            submitBtn.disabled = false;
+        }
+    }
+    </script>
 </body>
 </html>
