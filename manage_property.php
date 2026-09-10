@@ -15,12 +15,20 @@ if(isset($_POST['add_property'])){
     $price = mysqli_real_escape_string($conn, $_POST['price']);
     $location = mysqli_real_escape_string($conn, $_POST['location']);
 
+    // Latitude/Longitude are optional — if left blank, store NULL instead of an empty string
+    $latitude = ($_POST['latitude'] !== '') ? mysqli_real_escape_string($conn, $_POST['latitude']) : null;
+    $longitude = ($_POST['longitude'] !== '') ? mysqli_real_escape_string($conn, $_POST['longitude']) : null;
+    $lat_sql = $latitude !== null ? "'$latitude'" : "NULL";
+    $long_sql = $longitude !== null ? "'$longitude'" : "NULL";
+
     $insert = "INSERT INTO properties 
-               (title, price, location, manager_id, status) 
-               VALUES ('$title','$price','$location','$user_id','available')";
+               (title, price, location, latitude, longitude, manager_id, status) 
+               VALUES ('$title','$price','$location',$lat_sql,$long_sql,'$user_id','available')";
     
     if(mysqli_query($conn, $insert)){
         echo "<script>alert('Property Added Successfully!'); window.location='manage_properties.php';</script>";
+    } else {
+        echo "<script>alert('Error: ".mysqli_error($conn)."');</script>";
     }
 }
 
@@ -94,6 +102,12 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete'){
         }
         .btn-status{ background: #007bff; }
         .btn-del{ background: #6c757d; }
+        .coord-row{ display: flex; gap: 10px; }
+        .coord-row input{ margin: 10px 0; }
+        .hint{
+            font-size: 12px; color: #888; margin: -6px 0 10px;
+        }
+        .hint a{ color: #E8622A; }
     </style>
 </head>
 <body>
@@ -113,7 +127,20 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete'){
             <input type="number" name="price" 
                    placeholder="Rent Price" required>
             <input type="text" name="location" 
-                   placeholder="Location" required>
+                   placeholder="Location (e.g. Civil Lines Gujrat)" required>
+
+            <div class="coord-row">
+                <input type="text" name="latitude" 
+                       placeholder="Latitude (e.g. 32.5742)" pattern="^-?\d{1,3}(\.\d+)?$">
+                <input type="text" name="longitude" 
+                       placeholder="Longitude (e.g. 74.0856)" pattern="^-?\d{1,3}(\.\d+)?$">
+            </div>
+            <p class="hint">
+                Optional — leave blank if unknown. Get exact coordinates from
+                <a href="https://maps.google.com" target="_blank" rel="noopener">Google Maps</a>:
+                right-click the property location → "What's here?" → copy the two numbers shown.
+            </p>
+
             <button type="submit" name="add_property">
                 Add Property
             </button>
@@ -125,6 +152,7 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete'){
                 <th>Title</th>
                 <th>Price</th>
                 <th>Location</th>
+                <th>Coordinates</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -142,6 +170,13 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete'){
                 echo "<td>".$row['title']."</td>";
                 echo "<td>Rs. ".$row['price']."</td>";
                 echo "<td>".$row['location']."</td>";
+                echo "<td>";
+                if(!empty($row['latitude']) && !empty($row['longitude'])){
+                    echo "<span style='color:#28a745; font-size:12px;'>✓ ".$row['latitude'].", ".$row['longitude']."</span>";
+                } else {
+                    echo "<span style='color:#bbb; font-size:12px;'>Not set</span>";
+                }
+                echo "</td>";
                 echo "<td><span class='badge ".$row['status']."'>".ucfirst($row['status'])."</span></td>";
                 echo "<td>";
                 echo "<a href='manage_properties.php?action=toggle_status&id=".$row['id']."&status=".$row['status']."' 
@@ -157,7 +192,7 @@ if(isset($_GET['action']) && $_GET['action'] == 'delete'){
                 echo "</tr>";
             }
             if(mysqli_num_rows($res) == 0){ 
-                echo "<tr><td colspan='5' style='text-align:center;'>No properties found.</td></tr>"; 
+                echo "<tr><td colspan='6' style='text-align:center;'>No properties found.</td></tr>"; 
             }
             ?>
         </table>
