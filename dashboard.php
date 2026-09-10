@@ -26,6 +26,7 @@ if($role == 'tenant'){
         ['payments_history.php', '💰', 'Payment History', 'Transactions'],
         ['property_status.php', '📊', 'Property Status', 'Occupancy'],
         ['maintenance.php', '🔧', 'Maintenance', 'Report issue'],
+        ['my_favorites.php', '❤️', 'My Favorites', 'Saved properties'],
     ];
 } elseif($role == 'owner'){
     $menus = [
@@ -51,7 +52,7 @@ if($role == 'tenant'){
         ['properties.php', '🏠', 'Properties', 'Browse listings'],
         ['manage_users.php', '👥', 'Manage Users', 'User accounts'],
         ['manage_property_manager.php', '👨‍💼', 'Manage Managers', 'Assign managers'],
-        ['manage_property.php', '🏢', 'Manage Properties', 'Edit listings'],
+        ['manage_property.php', '🏢', 'Manage Property', 'Edit listings'],
         ['payments_history.php', '💰', 'Payment History', 'Transactions'],
     ];
 }
@@ -62,7 +63,7 @@ if($role == 'tenant'){
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard — Hira Property</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"> -->
     <style>
         :root {
             --bg: #FAF8F4;
@@ -80,7 +81,7 @@ if($role == 'tenant'){
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Poppins', Arial, sans-serif;
             background: var(--bg);
             color: var(--text);
             display: flex;
@@ -114,7 +115,7 @@ if($role == 'tenant'){
         }
         .logo-mark svg { display: block; }
         .logo-name {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Playfair Display', Georgia, serif;
             font-size: 19px; font-weight: 700;
             color: #fff; letter-spacing: 0.3px;
         }
@@ -180,7 +181,7 @@ if($role == 'tenant'){
             text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;
         }
         .greeting-name {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Playfair Display', Georgia, serif;
             font-size: 30px; font-weight: 700;
             color: var(--navy); line-height: 1.1;
         }
@@ -207,7 +208,7 @@ if($role == 'tenant'){
             text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px;
         }
         .stat-val {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Playfair Display', Georgia, serif;
             font-weight: 700; line-height: 1;
         }
         .stat-val.big { font-size: 48px; color: var(--accent); }
@@ -266,7 +267,7 @@ if($role == 'tenant'){
     <div class="sidebar-logo">
         <div class="logo-top">
             <div class="logo-mark" style="overflow:hidden;">
-                <img src="assets/logo.png.jpeg" alt="Hira Property"
+                <img src="assets/logo.png" alt="Hira Property"
                      style="width:100%; height:100%; object-fit:cover; border-radius:6px;"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="display:none;">
@@ -359,5 +360,6 @@ if($role == 'tenant'){
     </div>
 </main>
 
+<?php include 'chatbot_widget.php'; ?>
 </body>
 </html>
