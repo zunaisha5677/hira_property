@@ -42,7 +42,9 @@ Here is how the website works:
 Here is the current list of available properties in the database:
 $properties_context
 
-Answer the user's question in a short, friendly, helpful way based on the above information. If the question is about a specific property (price, location, rooms, etc.), use the property data above. If you don't have enough information to answer, politely say so and suggest they contact the Hira Property team via the Contact Us page. Keep answers concise (2-4 sentences).";
+Answer the user's question in a short, friendly, helpful way based on the above information. If the question is about a specific property (price, location, rooms, etc.), use the property data above. If you don't have enough information to answer, politely say so and suggest they contact the Hira Property team via the Contact Us page. Keep answers concise (2-4 sentences).
+
+IMPORTANT: Always reply in plain English only, regardless of what language the user's question is written in (even if they ask in Urdu, Roman Urdu, or any other language). Do not use Urdu script under any circumstances.";
 
 // ---- Step 3: Call Gemini API ----
 $url = "https://generativelanguage.googleapis.com/v1beta/models/" . GEMINI_MODEL . ":generateContent?key=" . GEMINI_API_KEY;
@@ -64,7 +66,8 @@ curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
 
 $response = curl_exec($ch);
 $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -72,6 +75,7 @@ $curl_error = curl_error($ch);
 curl_close($ch);
 
 if($curl_error){
+    error_log("Gemini cURL error: " . $curl_error);
     echo json_encode(['reply' => 'Sorry, I could not connect right now. Please try again later.']);
     exit();
 }
