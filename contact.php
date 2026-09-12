@@ -11,9 +11,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['contact_submit'])){
     $c_message = $_POST['c_message'];
 
     if(send_contact_email($c_name, $c_email, $c_subject, $c_message)){
-        $contact_success = "✅ Shukriya! Aapka message bhej diya gaya hai, hum jald contact karenge.";
+        $contact_success = "✅ Thank you!Your message has been sent successfully.We will contact you soon";
     } else {
-        $contact_success = "❌ Message bhejne mein masla hua, dobara try karein.";
+        $contact_success = "❌ Somethinf went wrong while sending your message.Please try again";
     }
 }
 ?>
