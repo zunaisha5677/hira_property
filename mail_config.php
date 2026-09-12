@@ -1,19 +1,12 @@
 <?php
-// ============================================
-// Hira Property - Email (OTP) Sending Config
-// ============================================
-// Yeh file Gmail ke SMTP server se seedha baat karti hai
-// (koi external library/PHPMailer download karne ki zaroorat nahi)
 
-// ---- Apni Gmail details (already set) ----
 define('SMTP_HOST', 'smtp.gmail.com');
 define('SMTP_PORT', 587);
-define('SMTP_USERNAME', 'zunaisha5677@gmail.com');
-define('SMTP_PASSWORD', 'oikxvabeqqajnexw'); // App Password (spaces ke bina)
-define('SMTP_FROM_EMAIL', 'zunaisha5677@gmail.com');
+define('SMTP_USERNAME', 'zunaisha56778@gmail.com');
+define('SMTP_PASSWORD', 'hrixnrvtfvhspbfm');
+define('SMTP_FROM_EMAIL', 'zunaisha56778@gmail.com');
 define('SMTP_FROM_NAME', 'Hira Property');
 
-// Helper: SMTP server se ek response line parhna
 function smtp_read_response($socket){
     $data = "";
     while($str = fgets($socket, 515)){
@@ -23,8 +16,6 @@ function smtp_read_response($socket){
     return $data;
 }
 
-// Main function: OTP email bhejta hai
-// Return: true (kamyabi) ya false (nakami)
 function send_otp_email($to_email, $otp_code){
     $socket = @fsockopen(SMTP_HOST, SMTP_PORT, $errno, $errstr, 15);
     if(!$socket){
@@ -93,12 +84,9 @@ function send_otp_email($to_email, $otp_code){
     smtp_read_response($socket);
     fclose($socket);
 
-    // "250" ka matlab hai email successfully accept hui
     return (strpos($send_response, "250") !== false);
 }
 
-// General purpose email sender (contact form ke liye)
-// Reply-To wale sender ka email set karta hai taake reply seedha unhe jaye
 function send_contact_email($visitor_name, $visitor_email, $subject_line, $message_body){
     $socket = @fsockopen(SMTP_HOST, SMTP_PORT, $errno, $errstr, 15);
     if(!$socket){
@@ -131,7 +119,7 @@ function send_contact_email($visitor_name, $visitor_email, $subject_line, $messa
         return false;
     }
 
-    $to_email = SMTP_FROM_EMAIL; // Hira Property ki team ko yeh mail milegi
+    $to_email = SMTP_FROM_EMAIL;
 
     fputs($socket, "MAIL FROM: <" . SMTP_FROM_EMAIL . ">\r\n");
     smtp_read_response($socket);
@@ -164,11 +152,6 @@ function send_contact_email($visitor_name, $visitor_email, $subject_line, $messa
     return (strpos($send_response, "250") !== false);
 }
 
-// ============================================
-// NAYA FUNCTION: Booking Confirmation Email
-// ============================================
-// Jab manager/owner kisi rental request ko "approve" kare,
-// tenant ko yeh email chali jaati hai apni registered email par
 function send_booking_confirmation_email($to_email, $tenant_name, $property_title, $property_location, $rent){
     $socket = @fsockopen(SMTP_HOST, SMTP_PORT, $errno, $errstr, 15);
     if(!$socket){
