@@ -10,9 +10,19 @@ if(!isset($_SESSION['user_id'])){
 $user_id = $_SESSION['user_id'];
 $role = strtolower($_SESSION['role']); 
 
+// If we arrived from a specific property's "Schedule Visit" button
+// (schedule_visit.php?property_id=13), lock the form to that property
+// so the tenant can't accidentally pick a different one from a dropdown.
+$locked_property = null;
+if($role == 'tenant' && isset($_GET['property_id'])){
+    $locked_id = intval($_GET['property_id']);
+    $lock_q = mysqli_query($conn, "SELECT id, title FROM properties WHERE id='$locked_id'");
+    $locked_property = mysqli_fetch_assoc($lock_q);
+}
+
 // 1. Tenant Request Submit Handle Karein
 if($role == 'tenant' && isset($_POST['submit_visit'])){
-    $property_id = $_POST['property_id'];
+    $property_id = intval($_POST['property_id']);
     $visit_date = $_POST['visit_date'];
     $visit_time = $_POST['visit_time'];
 
@@ -54,6 +64,7 @@ if(($role == 'owner' || $role == 'manager') && isset($_GET['action']) && $_GET['
         .box{ background: #fff; padding: 25px; border-radius: 10px; border: 1px solid #ddd; max-width: 600px; margin: 0 auto; }
         h2 { color: #E8622A; margin-top: 0; }
         input, select, button { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        input[disabled]{ background: #f0f0f0; color: #555; }
         button { background: #E8622A; color: white; border: none; font-size: 16px; cursor: pointer; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
@@ -66,6 +77,7 @@ if(($role == 'owner' || $role == 'manager') && isset($_GET['action']) && $_GET['
         .btn-app { background: #28a745; }
         .btn-rej { background: #dc3545; }
         .btn-del { background: #6c757d; } /* Grey color for Delete */
+        .locked-note{ font-size: 12px; color: #888; margin: -6px 0 4px; }
     </style>
 </head>
 <body>
@@ -78,15 +90,22 @@ if(($role == 'owner' || $role == 'manager') && isset($_GET['action']) && $_GET['
         <?php if($role == 'tenant'): ?>
             <h3>Request a New House Visit</h3>
             <form method="POST">
-                <label>Select Property:</label>
-                <select name="property_id" required>
-                    <?php
-                    $props = mysqli_query($conn, "SELECT id, title FROM properties");
-                    while($p = mysqli_fetch_assoc($props)){
-                        echo "<option value='".$p['id']."'>".$p['title']."</option>";
-                    }
-                    ?>
-                </select>
+                <?php if($locked_property): ?>
+                    <label>Property:</label>
+                    <input type="text" value="<?php echo htmlspecialchars($locked_property['title']); ?>" disabled>
+                    <p class="locked-note">This visit will be booked for the property you came from. To visit a different property, open its page and click "Schedule Visit" there instead.</p>
+                    <input type="hidden" name="property_id" value="<?php echo $locked_property['id']; ?>">
+                <?php else: ?>
+                    <label>Select Property:</label>
+                    <select name="property_id" required>
+                        <?php
+                        $props = mysqli_query($conn, "SELECT id, title FROM properties");
+                        while($p = mysqli_fetch_assoc($props)){
+                            echo "<option value='".$p['id']."'>".$p['title']."</option>";
+                        }
+                        ?>
+                    </select>
+                <?php endif; ?>
 
                 <label>Select Date:</label>
                 <input type="date" name="visit_date" required min="<?php echo date('Y-m-d'); ?>">
