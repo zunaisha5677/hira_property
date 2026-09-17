@@ -27,7 +27,7 @@ if(isset($_POST['status']) && isset($_POST['booking_id']) && $role != 'tenant') 
     $prop_status = ($status == 'rejected') ? 'available' : 'occupied';
     mysqli_query($conn, "UPDATE properties SET status = '$prop_status' WHERE id = '$property_id'");
 
-    // ---- Agar request approve hui, tenant ko confirmation email bhejo ----
+    // If the request was approved, send the tenant a confirmation email
     if($status == 'approved'){
         $detail_query = mysqli_query($conn, "
             SELECT u.email, u.first_name, p.title, p.location, p.price
