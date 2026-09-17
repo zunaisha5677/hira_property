@@ -13,8 +13,8 @@ if(empty($user_question)){
 }
 
 // ---- Step 1: Pull ALL available properties as context ----
-// (Agar aapke paas bohot zyada properties hon future mein, to yahan
-// keyword-based WHERE filter laga sakte hain taake sirf relevant rows aayen)
+// (If the number of properties grows a lot in the future, a keyword-based
+// WHERE filter can be added here so only relevant rows are pulled)
 $properties_context = "";
 $result = mysqli_query($conn, "SELECT title, location, price, marla, rooms, bathrooms, status, description FROM properties");
 
@@ -26,7 +26,7 @@ if($result && mysqli_num_rows($result) > 0){
     $properties_context = "No properties currently listed.";
 }
 
-// ---- Step 2: Build the system prompt (AI ko project ka pura context) ----
+// ---- Step 2: Build the system prompt (full project context for the AI) ----
 $system_prompt = "You are the official assistant chatbot for 'Hira Property', a rental property management website based in Gujrat, Pakistan.
 
 Here is how the website works:
